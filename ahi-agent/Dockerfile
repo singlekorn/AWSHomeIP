@@ -1,12 +1,20 @@
-FROM mcr.microsoft.com/powershell:lts-7.2-alpine-3.14
+# Official Python image
+FROM python:3.11-rc-alpine
 
-RUN pwsh -Command Install-Module -Name AWS.Tools.Common -Force
-RUN pwsh -Command Install-Module -Name AWS.Tools.EventBridge -Force
+ENV PACKAGES \
+  tzdata
 
-RUN echo '*/1  *  *  *  *    /opt/update.sh' > /etc/crontabs/root
+COPY requirements.txt ./
+
+RUN apk update && apk upgrade && \
+    apk add --no-cache ${PACKAGES} && \
+    pip install --no-cache-dir -r requirements.txt
+
 RUN cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+RUN echo '*/1  *  *  *  *    /opt/update.sh' > /etc/crontabs/root
+
 WORKDIR /opt
 COPY ./scripts/ . 
 
-ENTRYPOINT [ "/opt/entrypoint.sh" ]
-# CMD [ "sh" ]
+# ENTRYPOINT [ "/opt/entrypoint.sh" ]
+CMD [ "sh" ]

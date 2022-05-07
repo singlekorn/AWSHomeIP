@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # Execute script
-pwsh -f /opt/ahi-agent.ps1
+python /opt/ahi-agent.py

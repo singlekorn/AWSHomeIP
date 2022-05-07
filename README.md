@@ -8,7 +8,7 @@ Automatically keep an AWS Managed Prefix List updated with your Home's Public IP
 
 ![Start Here](./docs/AWSHomeIP_StartHere.svg)
 
-## Related
+## Related Projects
 - The **AHI-Updater** and **AHI-Reflector** AWS infrastructure components are deployed using Terraform Cloud.
 - Terraform configuration is based on the 2env/2region template provided in https://github.com/singlekorn/aws-1korn
     - *Terraform Cloud Workspaces* for this template can be deployed using https://github.com/singlekorn/tfc-singlekorn
@@ -35,12 +35,23 @@ This component is a Docker Container found in the ./ahi-agent directory.
     ```
 
 ## Docker Summary
-- Base Image: `mcr.microsoft.com/powershell:lts-7.2-alpine-3.14`
-- Add `AWS.Tools.Common` and `AWS.Tools.EventBridge`
-- Use Cron to run the `ahi-agent.ps1` script every 6-hours
+- Base Image: `python:3.11-rc-alpine`
+- Add `boto3`
+- Use Cron to run the `ahi-agent.py` script every 6-hours
 
-![AHI-Agent](./docs/AWSHomeIP_AHI_Agent.svg)
+![AHI-Agent](./docs/AWSHomeIP_AHI_Agent_python.svg)
+
+## ahi-agent.py Summary
+
+- Get Public IPs from AHI-Reflector URLs
+    - Using a pinned CTL, validate Server Authentication
+    - Validate we get 200s, and results are IPv4 Addresses
+    - Throw error
+- Send Public IPs to AWS EventBridge
+    - Create PutEvent payload
+    - Send PutEvent
+    - Throw error
 
 ## Building & Testing
 From the /ahi-agent working directory:
-```docker build -t ahi-agent:test . && docker run --rm --env-file .env -it ahi-agent:test```
+```docker build -t ahi-agent:python . && docker run --rm --env-file .env -it ahi-agent:python```
