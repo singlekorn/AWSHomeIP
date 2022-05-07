@@ -7,6 +7,7 @@ $ips=@()
 foreach ($url in ($env:URLS -split ',')) {
 
     # ADD validation: Good Request, is IPv4 Address
+    # ADD validation: Expected TLS (pin valid SubCA cert in source)
     $ip = (Invoke-WebRequest -Uri $url | ConvertFrom-Json).ip
     Write-Host "$((Get-PSCallStack)[0].FunctionName): INFO `'$url`' is reachable from $ip"
     $ips += $ip
